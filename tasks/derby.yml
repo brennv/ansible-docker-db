@@ -1,0 +1,51 @@
+---
+
+  - name: search derby image
+    shell: docker inspect database/busybox-derby:{{derby_version}}
+    ignore_errors: yes
+    register: search_derby_response
+
+  - include: derby-build-container.yml
+    when: search_derby_response|failed
+
+  - name: inspect derby container
+    shell: docker inspect derby
+    register: inspect_derby_response
+    ignore_errors: yes
+    when: search_derby_response|changed
+
+  - set_fact: derby_db_running="{{(inspect_derby_response.stdout|from_json)[0].State.Running}}" derby_db_image="{{(inspect_derby_response.stdout|from_json)[0].Config.Image}}"
+    when: "(inspect_derby_response.stdout|from_json)|length > 0"
+
+  - name: stop derby container
+    shell: docker kill derby
+    ignore_errors: yes
+    register: stop_derby_container
+    when: "derby_db_running is defined and derby_db_running and not(derby_db_image == 'database/busybox-derby:{{derby_version}}')"
+
+  - name: remove derby container
+    shell: docker rm derby
+    ignore_errors: yes
+    register: remove_derby_container
+    when: "derby_db_image is defined and not(derby_db_image == 'database/busybox-derby:{{derby_version}}')"
+
+  - file: path=/var/lib/derby/databases state=directory
+
+  - name: start derby container
+    docker:
+      image=database/busybox-derby:{{derby_version}}
+      memory_limit=1024MB
+      name=derby
+      ports=1527
+      state=running
+      volumes=/var/lib/derby/databases:/opt/derby/databases:rw
+    register: start_derby
+    when: "derby_db_running is not defined or not derby_db_running or stop_derby_container|changed"
+
+  - name: inspect derby container
+    shell: docker inspect derby
+    register: inspect_derby_response
+
+  - set_fact: derby_db_ip="{{(inspect_derby_response.stdout|from_json)[0].NetworkSettings.IPAddress}}" derby_db_port="{{(inspect_derby_response.stdout|from_json)[0].NetworkSettings.Ports['1527/tcp'][0].HostPort}}"
+    when: inspect_derby_response|changed
+

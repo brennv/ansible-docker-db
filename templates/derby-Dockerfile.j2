@@ -1,0 +1,33 @@
+#
+# Dockerfile for derby
+#
+
+FROM jeanblanchard/busybox-java:{{java_version}}
+
+ENV DERBY_VERSION {{derby_version}}
+ENV DERBY_HOME /opt/derby
+
+# install derby
+RUN \
+    mkdir /opt/derby && \
+    cd /tmp && \
+    wget -q http://apache.osuosl.org/db/derby/db-derby-${DERBY_VERSION}/db-derby-${DERBY_VERSION}-bin.tar.gz && \
+    gunzip db-derby-${DERBY_VERSION}-bin.tar.gz && \
+    tar xf db-derby-${DERBY_VERSION}-bin.tar && \
+    rm db-derby-${DERBY_VERSION}-bin.tar && \
+    cp -R db-derby-${DERBY_VERSION}-bin/* /opt/derby/ && \
+    rm -R db-derby-${DERBY_VERSION}-bin
+
+ADD run.sh /run.sh
+RUN chmod +x /*.sh
+
+# Define mountable directories.
+VOLUME ["/opt/derby/databases"]
+
+# Expose ports.
+EXPOSE 1527
+
+# Define default command.
+CMD /run.sh
+
+

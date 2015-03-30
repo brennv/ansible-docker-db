@@ -1,0 +1,7 @@
+---
+
+  postgresql_version: 9.3
+  postgres_username: postgres
+  postgres_password: postgres
+  postgresql_port: 5432
+  db_port: "{{postgresql_port}}"

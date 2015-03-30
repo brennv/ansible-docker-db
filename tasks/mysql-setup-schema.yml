@@ -1,0 +1,11 @@
+---
+
+  - apt: pkg=python-mysqldb
+    when: ansible_os_family == 'Debian'
+
+  - yum: pkg=python-mysqldb
+    when: ansible_os_family == 'CentOS'
+
+  - mysql_db: name="{{db_schema}}" login_host="{{mysql_db_ip}}" login_port="{{mysql_port}}" login_user="root" login_password="{{mysql_password}}" encoding="{{mysql_encoding}}" collation="{{mysq_collation}}"
+
+  - mysql_user: login_host="{{mysql_db_ip}}" login_port="{{mysql_port}}" login_user="root" login_password="{{mysql_password}}" name="{{db_username}}" password="{{db_password}}" host="%" priv="{{db_schema}}.*:ALL"

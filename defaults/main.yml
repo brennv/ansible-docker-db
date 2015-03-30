@@ -1,0 +1,6 @@
+---
+
+  db_dialect: postgresql
+  db_username: username
+  db_password: changeit
+  db_schema: "{{db_username}}"

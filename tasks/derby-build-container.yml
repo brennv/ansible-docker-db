@@ -1,0 +1,16 @@
+---
+
+  - name: copy derby files
+    copy: src={{item}} dest=/tmp/derby/
+    with_items:
+        - derby/
+
+  - name: copy derby docker file
+    template: src=derby-Dockerfile.j2 dest=/tmp/derby/Dockerfile
+
+  - name: build derby
+    docker_image: path="/tmp/derby"
+                  name="database/busybox-derby"
+                  state=present
+                  tag={{derby_version}}
+    register: build_derby

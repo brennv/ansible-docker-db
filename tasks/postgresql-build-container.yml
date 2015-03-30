@@ -1,0 +1,16 @@
+---
+
+  - name: copy postgresql docker files
+    copy: src={{item}} dest=/tmp/postgresql/
+    with_items:
+        - postgresql/
+
+  - name: copy postgresql docker file
+    template: src=postgresql-Dockerfile.j2 dest=/tmp/postgresql/Dockerfile
+
+  - name: build postgresql
+    docker_image: path="/tmp/postgresql"
+                  name="database/postgresql"
+                  state=present
+                  tag={{postgresql_version}}
+    register: build_postgresql

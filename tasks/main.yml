@@ -1,0 +1,31 @@
+---
+
+  - include_vars: postgresql.yml
+    when: db_dialect == 'postgresql'
+
+  - include_vars: mysql.yml
+    when: db_dialect == 'mysql'
+
+  - include_vars: derby.yml
+    when: db_dialect == 'derby'
+
+  - include: postgresql.yml
+    when: db_dialect == 'postgresql'
+
+  - include: mysql.yml
+    when: db_dialect == 'mysql'
+
+  - include: derby.yml
+    when: db_dialect == 'derby'
+
+  - include: setup-schema.yml
+
+  - name: add upstart conf
+    template: src=upstart.j2 dest="/etc/init/{{db_dialect}}.conf"
+
+  - file: src="/etc/init/{{db_dialect}}.conf" dest="/etc/init.d/{{db_dialect}}" state=link
+
+  - name: register upstart
+    shell: initctl reload-configuration
+
+  - include: ambassador.yml

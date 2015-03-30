@@ -1,0 +1,17 @@
+---
+
+  - include: postgresql-setup-schema.yml
+    when: db_dialect == 'postgresql'
+
+  - include: mysql-setup-schema.yml
+    when: db_dialect == 'mysql'
+
+#  - include: derby-setup-schema.yml
+#    when: db_dialect == 'derby'
+
+#  - name: start oracle-xe service
+#    service: name=oracle-xe state=started
+#    when: db_dialect == 'oracle'
+
+#  - include: oracle-setup-schema.yml
+#    when: db_dialect == 'oracle'

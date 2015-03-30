@@ -1,0 +1,6 @@
+#
+# Dockerfile for postgresql
+#
+
+FROM postgres:{{postgresql_version}}
+ADD fix-acl.sh /docker-entrypoint-initdb.d/

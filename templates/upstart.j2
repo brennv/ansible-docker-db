@@ -1,0 +1,8 @@
+description "{{db_dialect}} container"
+author "fupelaqu"
+start on filesystem and started docker
+stop on runlevel [!2345]
+respawn
+script
+  /usr/bin/docker start -a {{db_dialect}}
+end script

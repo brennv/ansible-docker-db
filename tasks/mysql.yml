@@ -1,0 +1,51 @@
+---
+
+  - name: search mysql image
+    shell: docker inspect database/mysql:{{mysql_version}}
+    ignore_errors: yes
+    register: search_mysql_response
+
+  - include: mysql-build-container.yml
+    when: search_mysql_response|failed
+
+  - name: inspect mysql container
+    shell: docker inspect mysql
+    register: inspect_mysql_response
+    ignore_errors: yes
+    when: search_mysql_response|changed
+
+  - set_fact: mysql_db_running="{{(inspect_mysql_response.stdout|from_json)[0].State.Running}}" mysql_db_image="{{(inspect_mysql_response.stdout|from_json)[0].Config.Image}}"
+    when: "(inspect_mysql_response.stdout|from_json)|length > 0"
+
+  - name: stop mysql container
+    shell: docker kill mysql
+    ignore_errors: yes
+    register: stop_mysql_container
+    when: "mysql_db_running is defined and mysql_db_running and not(mysql_db_image == 'database/mysql:{{mysql_version}}')"
+
+  - name: remove mysql container
+    shell: docker rm mysql
+    ignore_errors: yes
+    register: remove_mysql_container
+    when: "mysql_db_image is defined and not(mysql_db_image == 'database/mysql:{{mysql_version}}')"
+
+  - file: path=/var/lib/mysql state=directory
+
+  - name: start mysql container
+    docker:
+      image=database/mysql:{{mysql_version}}
+      memory_limit=1024MB
+      name=mysql
+      ports=3306
+      env="MYSQL_ROOT_PASSWORD={{mysql_password}},MYSQL_USER={{db_username}},MYSQL_PASSWORD={{db_password}},MYSQL_DATABASE={{db_schema}}"
+      state=running
+      volumes=/var/lib/database/mysql:/var/lib/database/mysql:rw
+    register: start_mysql
+    when: "mysql_db_running is not defined or not mysql_db_running or stop_mysql_container|changed"
+
+  - name: inspect mysql container
+    shell: docker inspect mysql
+    register: inspect_mysql_response
+
+  - set_fact: mysql_db_ip="{{(inspect_mysql_response.stdout|from_json)[0].NetworkSettings.IPAddress}}" mysql_db_port="{{(inspect_mysql_response.stdout|from_json)[0].NetworkSettings.Ports['3306/tcp'][0].HostPort}}"
+    when: inspect_mysql_response|changed
