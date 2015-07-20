@@ -3,19 +3,20 @@
   - name: start db ambassador container
     docker:
       image: cpuguy83/docker-grand-ambassador
-      name: "{{db_dialect}}_ambassador"
-      command: "-name {{db_dialect}}"
+      name: "{{db_name}}_ambassador"
+      command: "-name {{db_name}}"
       net: "bridge"
       expose: "{{db_port}}"
-      ports: "{{ hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address'] }}:{{db_port}}:{{db_port}}"
+      ports: "{{ ambassador_interface }}:{{ambassador_port}}:{{db_port}}"
       volumes: /var/run/docker.sock:/var/run/docker.sock:ro
-      state: running
+      state: reloaded
+      restart_policy: always
     register: start_ambassador
 
-  - name: add ambassador upstart conf
-    template: src=ambassador.j2 dest="/etc/init/{{db_dialect}}_ambassador.conf"
+#  - name: add ambassador upstart conf
+#    template: src=ambassador.j2 dest="/etc/init/{{db_name}}_ambassador.conf"
 
-  - file: src="/etc/init/{{db_dialect}}_ambassador.conf" dest="/etc/init.d/{{db_dialect}}_ambassador" state=link
+#  - file: src="/etc/init/{{db_name}}_ambassador.conf" dest="/etc/init.d/{{db_name}}_ambassador" state=link
 
-  - name: register ambassador upstart
-    shell: initctl reload-configuration
+#  - name: register ambassador upstart
+#    shell: initctl reload-configuration

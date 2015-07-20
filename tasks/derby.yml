@@ -9,7 +9,7 @@
     when: search_derby_response|failed
 
   - name: inspect derby container
-    shell: docker inspect derby
+    shell: "docker inspect {{db_name}}"
     register: inspect_derby_response
     ignore_errors: yes
     when: search_derby_response|changed
@@ -18,13 +18,13 @@
     when: "(inspect_derby_response.stdout|from_json)|length > 0"
 
   - name: stop derby container
-    shell: docker kill derby
+    shell: "docker kill {{db_name}}"
     ignore_errors: yes
     register: stop_derby_container
     when: "derby_db_running is defined and derby_db_running and not(derby_db_image == 'database/busybox-derby:{{derby_version}}')"
 
   - name: remove derby container
-    shell: docker rm derby
+    shell: "docker rm {{db_name}}"
     ignore_errors: yes
     register: remove_derby_container
     when: "derby_db_image is defined and not(derby_db_image == 'database/busybox-derby:{{derby_version}}')"
@@ -33,17 +33,18 @@
 
   - name: start derby container
     docker:
-      image=database/busybox-derby:{{derby_version}}
-      memory_limit=1024MB
-      name=derby
-      ports=1527
-      state=running
-      volumes=/var/lib/derby/databases:/opt/derby/databases:rw
+      image: "database/busybox-derby:{{derby_version}}"
+      memory_limit: 1024MB
+      name: "{{db_name}}"
+      ports: 1527
+      state: reloaded
+      restart_policy: always
+      volumes: /var/lib/derby/databases:/opt/derby/databases:rw
     register: start_derby
     when: "derby_db_running is not defined or not derby_db_running or stop_derby_container|changed"
 
   - name: inspect derby container
-    shell: docker inspect derby
+    shell: "docker inspect {{db_name}}"
     register: inspect_derby_response
 
   - set_fact: derby_db_ip="{{(inspect_derby_response.stdout|from_json)[0].NetworkSettings.IPAddress}}" derby_db_port="{{(inspect_derby_response.stdout|from_json)[0].NetworkSettings.Ports['1527/tcp'][0].HostPort}}"

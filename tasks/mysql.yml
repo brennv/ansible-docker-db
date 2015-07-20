@@ -9,7 +9,7 @@
     when: search_mysql_response|failed
 
   - name: inspect mysql container
-    shell: docker inspect mysql
+    shell: "docker inspect {{db_name}}"
     register: inspect_mysql_response
     ignore_errors: yes
     when: search_mysql_response|changed
@@ -18,13 +18,13 @@
     when: "(inspect_mysql_response.stdout|from_json)|length > 0"
 
   - name: stop mysql container
-    shell: docker kill mysql
+    shell: "docker kill {{db_name}}"
     ignore_errors: yes
     register: stop_mysql_container
     when: "mysql_db_running is defined and mysql_db_running and not(mysql_db_image == 'database/mysql:{{mysql_version}}')"
 
   - name: remove mysql container
-    shell: docker rm mysql
+    shell: "docker rm {{db_name}}"
     ignore_errors: yes
     register: remove_mysql_container
     when: "mysql_db_image is defined and not(mysql_db_image == 'database/mysql:{{mysql_version}}')"
@@ -33,18 +33,19 @@
 
   - name: start mysql container
     docker:
-      image=database/mysql:{{mysql_version}}
-      memory_limit=1024MB
-      name=mysql
-      ports=3306
-      env="MYSQL_ROOT_PASSWORD={{mysql_password}},MYSQL_USER={{db_username}},MYSQL_PASSWORD={{db_password}},MYSQL_DATABASE={{db_schema}}"
-      state=running
-      volumes=/var/lib/database/mysql:/var/lib/database/mysql:rw
+      image: "database/mysql:{{mysql_version}}"
+      memory_limit: 1024MB
+      name: "{{db_name}}"
+      ports: "3306"
+      env: "MYSQL_ROOT_PASSWORD={{mysql_password}},MYSQL_USER={{db_username}},MYSQL_PASSWORD={{db_password}},MYSQL_DATABASE={{db_schema}}"
+      state: reloaded
+      restart_policy: always
+      volumes: /var/lib/database/mysql:/var/lib/database/mysql:rw
     register: start_mysql
     when: "mysql_db_running is not defined or not mysql_db_running or stop_mysql_container|changed"
 
   - name: inspect mysql container
-    shell: docker inspect mysql
+    shell: "docker inspect {{db_name}}"
     register: inspect_mysql_response
 
   - set_fact: mysql_db_ip="{{(inspect_mysql_response.stdout|from_json)[0].NetworkSettings.IPAddress}}" mysql_db_port="{{(inspect_mysql_response.stdout|from_json)[0].NetworkSettings.Ports['3306/tcp'][0].HostPort}}"

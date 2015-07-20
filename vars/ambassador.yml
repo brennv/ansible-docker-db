@@ -1,0 +1,4 @@
+---
+
+ambassador_port: "{{db_port}}"
+ambassador_interface: "{{ hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address'] }}" #ambassador interface

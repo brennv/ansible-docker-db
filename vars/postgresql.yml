@@ -1,7 +1,8 @@
 ---
 
-  postgresql_version: 9.3
-  postgres_username: postgres
-  postgres_password: postgres
-  postgresql_port: 5432
-  db_port: "{{postgresql_port}}"
+postgresql_version: 9.3
+postgres_username: postgres
+postgres_password: postgres
+postgresql_port: 5432
+postgresql_encoding: UTF8
+db_port: "{{postgresql_port}}"

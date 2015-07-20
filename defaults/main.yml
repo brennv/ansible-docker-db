@@ -1,6 +1,9 @@
 ---
 
-  db_dialect: postgresql
-  db_username: username
-  db_password: changeit
-  db_schema: "{{db_username}}"
+db_dialect: postgresql
+db_username: username
+db_password: changeit
+db_schema: "{{db_username}}"
+db_name: "{{db_dialect}}" #docker container name
+
+db_ambassador: yes

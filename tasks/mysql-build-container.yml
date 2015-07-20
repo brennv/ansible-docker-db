@@ -1,10 +1,5 @@
 ---
 
-#  - name: copy mysql docker files
-#    copy: src={{item}} dest=/tmp/mysql/
-#    with_items:
-#        - mysql/
-
   - file: path=/tmp/mysql state=directory
 
   - name: copy mysql docker file

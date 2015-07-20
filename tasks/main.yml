@@ -20,12 +20,16 @@
 
   - include: setup-schema.yml
 
-  - name: add upstart conf
-    template: src=upstart.j2 dest="/etc/init/{{db_dialect}}.conf"
+#  - name: add upstart conf
+#    template: src=upstart.j2 dest="/etc/init/{{db_name}}.conf"
 
-  - file: src="/etc/init/{{db_dialect}}.conf" dest="/etc/init.d/{{db_dialect}}" state=link
+#  - file: src="/etc/init/{{db_name}}.conf" dest="/etc/init.d/{{db_name}}" state=link
 
-  - name: register upstart
-    shell: initctl reload-configuration
+#  - name: register upstart
+#    shell: initctl reload-configuration
+
+  - include_vars: ambassador.yml
+    when: db_ambassador == "yes"
 
   - include: ambassador.yml
+    when: db_ambassador == "yes"

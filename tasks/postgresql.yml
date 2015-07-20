@@ -9,7 +9,7 @@
     when: search_postgresql_response|failed
 
   - name: inspect postgresql container
-    shell: docker inspect postgresql
+    shell: "docker inspect {{db_name}}"
     register: inspect_postgresql_response
     ignore_errors: yes
     when: search_postgresql_response|changed
@@ -18,13 +18,13 @@
     when: "(inspect_postgresql_response.stdout|from_json)|length > 0"
 
   - name: stop postgresql container
-    shell: docker kill postgresql
+    shell: "docker kill {{db_name}}"
     ignore_errors: yes
     register: stop_postgresql_container
     when: "postgresql_db_running is defined and postgresql_db_running and not(postgresql_db_image == 'database/postgresql:{{postgresql_version}}')"
 
   - name: remove postgresql container
-    shell: docker rm postgresql
+    shell: "docker rm {{db_name}}"
     ignore_errors: yes
     register: remove_postgresql_container
     when: "postgresql_db_image is defined and not(postgresql_db_image == 'database/postgresql:{{postgresql_version}}')"
@@ -33,18 +33,19 @@
 
   - name: start postgresql container
     docker:
-      image=database/postgresql:{{postgresql_version}}
-      memory_limit=1024MB
-      name=postgresql
-      ports=5432
-      env="POSTGRES_PASSWORD={{postgres_password}}"
-      state=running
-      volumes=/var/lib/postgresql/data:/var/lib/postgresql/data:rw
+      image: "database/postgresql:{{postgresql_version}}"
+      memory_limit: 1024MB
+      name: "{{db_name}}"
+      ports: 5432
+      env: "POSTGRES_PASSWORD={{postgres_password}}"
+      state: reloaded
+      restart_policy: always
+      volumes: /var/lib/postgresql/data:/var/lib/postgresql/data:rw
     register: start_postgresql
     when: "postgresql_db_running is not defined or not postgresql_db_running or stop_postgresql_container|changed"
 
   - name: inspect postgresql container
-    shell: docker inspect postgresql
+    shell: "docker inspect {{db_name}}"
     register: inspect_postgresql_response
 
   - set_fact: postgresql_db_ip="{{(inspect_postgresql_response.stdout|from_json)[0].NetworkSettings.IPAddress}}" postgresql_db_port="{{(inspect_postgresql_response.stdout|from_json)[0].NetworkSettings.Ports['5432/tcp'][0].HostPort}}"
