@@ -4,7 +4,7 @@
     when: ansible_os_family == 'Debian'
 
   - yum: pkg=python-psycopg2
-    when: ansible_os_family == 'CentOS'
+    when: ansible_os_family == 'RedHat'
 
   - postgresql_user: login_host="{{postgresql_db_ip}}" port="{{postgresql_port}}" login_user="{{postgres_username}}" login_password="{{postgres_password}}" name="{{db_username}}" password="{{db_password}}" role_attr_flags=CREATEDB,NOSUPERUSER
 

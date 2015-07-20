@@ -4,7 +4,7 @@
     when: ansible_os_family == 'Debian'
 
   - yum: pkg=python-mysqldb
-    when: ansible_os_family == 'CentOS'
+    when: ansible_os_family == 'RedHat'
 
   - mysql_db: name="{{db_schema}}" login_host="{{mysql_db_ip}}" login_port="{{mysql_port}}" login_user="root" login_password="{{mysql_password}}" encoding="{{mysql_encoding}}" collation="{{mysq_collation}}"
 
