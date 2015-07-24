@@ -6,6 +6,6 @@
   - yum: pkg=python-psycopg2
     when: ansible_os_family == 'RedHat'
 
-  - postgresql_user: login_host="{{postgresql_db_ip}}" port="{{postgresql_port}}" login_user="{{postgres_username}}" login_password="{{postgres_password}}" name="{{db_username}}" password="{{db_password}}" role_attr_flags=CREATEDB,NOSUPERUSER
+  - postgresql_user: login_host="127.0.0.1" port="{{postgresql_db_port}}" login_user="{{postgres_username}}" login_password="{{postgres_password}}" name="{{db_username}}" password="{{db_password}}" role_attr_flags=CREATEDB,NOSUPERUSER
 
-  - postgresql_db: name="{{db_schema}}" login_host="{{postgresql_db_ip}}" port="{{postgresql_port}}" login_user="{{postgres_username}}" login_password="{{postgres_password}}" owner="{{db_username}}" encoding=UTF8
+  - postgresql_db: name="{{db_schema}}" login_host="127.0.0.1" port="{{postgresql_db_port}}" login_user="{{postgres_username}}" login_password="{{postgres_password}}" owner="{{db_username}}" encoding=UTF8

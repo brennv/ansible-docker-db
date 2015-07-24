@@ -31,6 +31,9 @@
 
   - file: path=/var/lib/derby/databases state=directory
 
+  - shell: chcon -Rt svirt_sandbox_file_t /var/lib/derby/databases
+    when: selinux_status is defined
+
   - name: start derby container
     docker:
       image: "database/busybox-derby:{{derby_version}}"

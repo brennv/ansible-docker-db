@@ -31,6 +31,9 @@
 
   - file: path=/var/lib/mysql state=directory
 
+  - shell: chcon -Rt svirt_sandbox_file_t /var/lib/mysql
+    when: selinux_status is defined
+
   - name: start mysql container
     docker:
       image: "database/mysql:{{mysql_version}}"

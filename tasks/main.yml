@@ -1,5 +1,7 @@
 ---
 
+  - include: selinux.yml
+
   - include_vars: postgresql.yml
     when: db_dialect == 'postgresql'
 
