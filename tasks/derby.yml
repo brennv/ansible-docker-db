@@ -32,7 +32,7 @@
   - file: path=/var/lib/derby/databases state=directory
 
   - shell: chcon -Rt svirt_sandbox_file_t /var/lib/derby/databases
-    when: selinux_status is defined
+    when: selinux_status.rc != 0
 
   - name: start derby container
     docker:

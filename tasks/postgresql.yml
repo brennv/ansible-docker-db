@@ -32,7 +32,7 @@
   - file: path=/var/lib/postgresql/data state=directory
 
   - shell: chcon -Rt svirt_sandbox_file_t /var/lib/postgresql/data
-    when: selinux_status is defined
+    when: selinux_status.rc != 0
 
   - name: start postgresql container
     docker:

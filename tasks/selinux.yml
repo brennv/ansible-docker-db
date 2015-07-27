@@ -3,5 +3,5 @@
   - name: check if selinux is enabled
     command: getenforce
     register: selinux_status
-    ignore_errors: yes
+    changed_when: false
 
